@@ -4,6 +4,8 @@
 #include <time.h>
 #include <assert.h>
 
+#include <stdlib.h>		//jin - system()
+
 #include "network.h"
 #include "image.h"
 #include "data.h"
@@ -57,8 +59,11 @@ int time_comparator(const void *pa, const void *pb)
     return 0;
 }
 
+int cnt;
+
 void forward_network_gpu(network net, network_state state)
 {
+	cnt = 0;
     static time_benchmark_layers *avg_time_per_layer = NULL;
     static time_benchmark_layers *sorted_avg_time_per_layer = NULL;
     double start_time, end_time;
@@ -85,6 +90,7 @@ void forward_network_gpu(network net, network_state state)
         }
 
         l.forward_gpu(l, state);
+//		printf("forward_gpu_cnt: %d\n", cnt);
 
         if (net.benchmark_layers) {
             CHECK_CUDA(cudaDeviceSynchronize());
@@ -134,6 +140,7 @@ void forward_network_gpu(network net, network_state state)
             cvDestroyAllWindows();
         }
 */
+		cnt++;
     }
 
     if (net.benchmark_layers) {
@@ -692,7 +699,6 @@ float *network_predict_gpu(network net, float *input)
 
     //cudaGraphExec_t instance = (cudaGraphExec_t)net.cuda_graph_exec;
     static cudaGraphExec_t instance;
-
     if ((*net.cuda_graph_ready) == 0) {
         static cudaGraph_t graph;
         if (net.use_cuda_graph == 1) {
@@ -708,7 +714,7 @@ float *network_predict_gpu(network net, float *input)
 
         cuda_push_array(state.input, net.input_pinned_cpu, size);
         forward_network_gpu(net, state);
-
+		//system("free");	//jin - memory usage check
         if (net.use_cuda_graph == 1) {
             cudaStream_t stream0 = switch_stream(0);
             CHECK_CUDA(cudaStreamEndCapture(stream0, &graph));

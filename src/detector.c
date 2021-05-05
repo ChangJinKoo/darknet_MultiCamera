@@ -1966,6 +1966,7 @@ void run_detector(int argc, char **argv)
     float iou_thresh = find_float_arg(argc, argv, "-iou_thresh", .5);    // 0.5 for mAP
     float hier_thresh = find_float_arg(argc, argv, "-hier", .5);
     int cam_index = find_int_arg(argc, argv, "-c", 0);
+    int cam_index1 = find_int_arg(argc, argv, "-c1", 1);
     int frame_skip = find_int_arg(argc, argv, "-s", 0);
     int num_of_clusters = find_int_arg(argc, argv, "-num_of_clusters", 5);
     int width = find_int_arg(argc, argv, "-width", -1);
@@ -2027,10 +2028,11 @@ void run_detector(int argc, char **argv)
         int classes = option_find_int(options, "classes", 20);
         char *name_list = option_find_str(options, "names", "data/names.list");
         char **names = get_labels(name_list);
+
         if (filename)
             if (strlen(filename) > 0)
                 if (filename[strlen(filename) - 1] == 0x0d) filename[strlen(filename) - 1] = 0;
-        demo(cfg, weights, thresh, hier_thresh, cam_index, filename, names, classes, avgframes, frame_skip, prefix, out_filename,
+        demo(cfg, weights, thresh, hier_thresh, cam_index, cam_index1, filename, names, classes, avgframes, frame_skip, prefix, out_filename,
             mjpeg_port, dontdraw_bbox, json_port, dont_show, ext_output, letter_box, time_limit_sec, http_post_host, benchmark, benchmark_layers);
 
         free_list_contents_kvp(options);

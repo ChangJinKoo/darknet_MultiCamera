@@ -174,12 +174,12 @@ void forward_convolutional_layer_gpu(convolutional_layer l, network_state state)
     }
 
     //fill_ongpu(l.outputs*l.batch, 0, l.output_gpu, 1);
-    if(l.binary){
+    if(l.binary){ //Unused
         binarize_weights_gpu(l.weights_gpu, l.n, (l.c / l.groups)*l.size*l.size, l.binary_weights_gpu);
         swap_binary(&l);
     }
 
-    if(l.xnor){
+    if(l.xnor){ //Unused
         if (!l.align_bit_weights_gpu || state.train) {
             //binarize_weights_gpu(l.weights_gpu, l.n, (l.c / l.groups)*l.size*l.size, l.binary_weights_gpu);
 
@@ -206,7 +206,7 @@ void forward_convolutional_layer_gpu(convolutional_layer l, network_state state)
             //size_t t_intput_size = new_ldb * n;
             //size_t t_bit_input_size = t_intput_size / 8;// +1;
 
-            if (l.c % 32 == 0)
+            if (l.c % 32 == 0) 
             {
                 //printf("\n\n l.index = %d, l.w = %d, l.c = %d, l.n = %d, l.stride = %d, l.pad = %d - new XNOR \n", l.index, l.w, l.c, l.n, l.stride, l.pad);
                 //printf("l.align_workspace_size = %d, (l.c * l.w * l.h)  = %d \n", l.align_workspace_size, (l.c * l.w * l.h));

@@ -1733,9 +1733,9 @@ list *read_cfg(char *filename)
     int nu = 0;
     list *sections = make_list();
     section *current = 0;
-    while((line=fgetl(file)) != 0){
+    while((line=fgetl(file)) != 0){		//fgetl(): return 1 line in file
         ++ nu;
-        strip(line);
+        strip(line);		//strip(): make line no blank
         switch(line[0]){
             case '[':
                 current = (section*)xmalloc(sizeof(section));

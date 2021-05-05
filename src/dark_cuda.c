@@ -18,6 +18,9 @@ int gpu_index = 0;
 #include <cuda.h>
 #include <stdio.h>
 
+#include "demo.h"
+#include <stdbool.h>
+
 #pragma comment(lib, "cuda.lib")
 
 
@@ -31,6 +34,10 @@ int gpu_index = 0;
 #error "If you set CUDNN_HALF=1 then you must set CUDNN=1"
 #endif
 
+//TwoCam sync flag
+//extern bool flag;
+extern bool flag_init;
+extern count_fr;
 
 void cuda_set_device(int n)
 {
@@ -121,21 +128,41 @@ static int streamInit[16] = { 0 };
 
 cudaStream_t get_cuda_stream() {
     int i = cuda_get_device();
-    if (!streamInit[i]) {
-        printf("Create CUDA-stream - %d \n", i);
-        //cudaError_t status = cudaStreamCreate(&streamsArray[i], cudaStreamNonBlocking);
-        cudaError_t status = cudaStreamCreateWithFlags(&streamsArray[i], cudaStreamNonBlocking);
-        if (status != cudaSuccess) {
-            printf(" cudaStreamCreate error: %d \n", status);
-            const char *s = cudaGetErrorString(status);
-            printf("CUDA Error: %s\n", s);
-            status = cudaStreamCreateWithFlags(&streamsArray[i], cudaStreamNonBlocking);    // cudaStreamDefault
-            CHECK_CUDA(status);
-        }
-        streamInit[i] = 1;
-    }
-    return streamsArray[i];
+	if (flag_init == false || count_fr <= 3){
+		if (!streamInit[i]) {
+	        printf("Create CUDA-stream - %d \n", i);
+	        //cudaError_t status = cudaStreamCreate(&streamsArray[i], cudaStreamNonBlocking);
+	        cudaError_t status = cudaStreamCreateWithFlags(&streamsArray[i], cudaStreamNonBlocking);
+	        if (status != cudaSuccess) {
+	            printf(" cudaStreamCreate error: %d \n", status);
+	            const char *s = cudaGetErrorString(status);
+	            printf("CUDA Error: %s\n", s);
+	            status = cudaStreamCreateWithFlags(&streamsArray[i], cudaStreamNonBlocking);    // cudaStreamDefault
+	            CHECK_CUDA(status);
+	        }
+	        streamInit[i] = 1;
+	    }
+		return streamsArray[i];
+	}
+
+	if (count_fr == 4){
+		if (!streamInit[i+1]) {
+	        printf("Create CUDA-stream - %d \n", i+1);
+	        //cudaError_t status = cudaStreamCreate(&streamsArray[i], cudaStreamNonBlocking);
+	        cudaError_t status = cudaStreamCreateWithFlags(&streamsArray[i+1], cudaStreamNonBlocking);
+	        if (status != cudaSuccess) {
+	            printf(" cudaStreamCreate error: %d \n", status);
+	            const char *s = cudaGetErrorString(status);
+	            printf("CUDA Error: %s\n", s);
+	            status = cudaStreamCreateWithFlags(&streamsArray[i+1], cudaStreamNonBlocking);    // cudaStreamDefault
+	            CHECK_CUDA(status);
+	        }
+	        streamInit[i+1] = 1;
+	    }
+		return streamsArray[i+1];
+	}
 }
+
 
 /*
 static cudaStream_t streamsArray2[16];    // cudaStreamSynchronize( get_cuda_memcpy_stream() );
@@ -167,15 +194,31 @@ static cudnnHandle_t cudnnHandle[16];
 cudnnHandle_t cudnn_handle()
 {
     int i = cuda_get_device();
-    if(!cudnnInit[i]) {
-        cudnnCreate(&cudnnHandle[i]);
-        cudnnInit[i] = 1;
-        cudnnStatus_t status = cudnnSetStream(cudnnHandle[i], get_cuda_stream());
-        CHECK_CUDNN(status);
-        printf(" Create cudnn-handle %d \n", i);
-    }
-    return cudnnHandle[i];
+	if(flag_init == false || count_fr <= 3){
+	    if(!cudnnInit[i]) {
+	        cudnnCreate(&cudnnHandle[i]);
+	        cudnnInit[i] = 1;
+			cudnnStatus_t status = cudnnSetStream(cudnnHandle[i], get_cuda_stream());
+	        CHECK_CUDNN(status);
+	        printf(" Create cudnn-handle %d \n", i);
+			cudaStreamSynchronize(get_cuda_stream());
+	    }
+	    return cudnnHandle[i];
+	}
+
+	if(count_fr == 4){
+	    if(!cudnnInit[i+1]) {
+	        cudnnCreate(&cudnnHandle[i+1]);
+	        cudnnInit[i+1] = 1;
+			cudnnStatus_t status = cudnnSetStream(cudnnHandle[i+1], get_cuda_stream());
+	        CHECK_CUDNN(status);
+	        printf(" Create cudnn-handle %d \n", i);
+			cudaStreamSynchronize(get_cuda_stream());
+	    }
+	    return cudnnHandle[i+1];
+	}
 }
+
 
 
 void cudnn_check_error(cudnnStatus_t status)

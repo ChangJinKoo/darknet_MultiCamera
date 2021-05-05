@@ -1,6 +1,8 @@
 #include "image_opencv.h"
 #include <iostream>
 
+#include <malloc.h>
+
 #ifdef OPENCV
 #include "utils.h"
 
@@ -596,6 +598,8 @@ extern "C" cap_cv* get_capture_webcam(int index)
         cap = new cv::VideoCapture(index);
         //cap->set(CV_CAP_PROP_FRAME_WIDTH, 1280);
         //cap->set(CV_CAP_PROP_FRAME_HEIGHT, 960);
+	
+		cap->set(CV_CAP_PROP_FPS, 30);
     }
     catch (...) {
         cerr << " OpenCV exception: Web-camera " << index << " can't be opened! \n";
@@ -772,9 +776,9 @@ extern "C" image get_image_from_stream_resize(cap_cv *cap, int w, int h, int c, 
     c = c ? c : 3;
     cv::Mat *src = NULL;
 
-    static int once = 1;
+    static int once = 2;
     if (once) {
-        once = 0;
+        once -= 1;
         do {
             if (src) delete src;
             src = (cv::Mat*)get_capture_frame_cv(cap);

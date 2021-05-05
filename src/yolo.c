@@ -349,6 +349,7 @@ void run_yolo(int argc, char **argv)
     float thresh = find_float_arg(argc, argv, "-thresh", .2);
 	float hier_thresh = find_float_arg(argc, argv, "-hier", .5);
     int cam_index = find_int_arg(argc, argv, "-c", 0);
+    int cam_index1 = find_int_arg(argc, argv, "-c1", 1);
     int frame_skip = find_int_arg(argc, argv, "-s", 0);
 	int ext_output = find_arg(argc, argv, "-ext_output");
     if(argc < 4){
@@ -363,6 +364,6 @@ void run_yolo(int argc, char **argv)
     else if(0==strcmp(argv[2], "train")) train_yolo(cfg, weights);
     else if(0==strcmp(argv[2], "valid")) validate_yolo(cfg, weights);
     else if(0==strcmp(argv[2], "recall")) validate_yolo_recall(cfg, weights);
-    else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, hier_thresh, cam_index, filename, voc_names, 20, 1, frame_skip,
+    else if(0==strcmp(argv[2], "demo")) demo(cfg, weights, thresh, hier_thresh, cam_index, cam_index1, filename, voc_names, 20, 1, frame_skip,
 		prefix, out_filename, mjpeg_port, 0, json_port, dont_show, ext_output, 0, 0, 0, 0, 0);
 }

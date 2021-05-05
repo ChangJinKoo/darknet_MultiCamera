@@ -1183,7 +1183,7 @@ void forward_yolo_layer_gpu(const layer l, network_state state)
             if (l.new_coords) {
                 //activate_array_ongpu(l.output_gpu + bbox_index, 4 * l.w*l.h, LOGISTIC);    // x,y,w,h
             }
-            else {
+            else {	
                 activate_array_ongpu(l.output_gpu + bbox_index, 2 * l.w*l.h, LOGISTIC);    // x,y
 
                 int obj_index = entry_index(l, b, n*l.w*l.h, 4);

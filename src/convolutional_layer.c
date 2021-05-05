@@ -677,7 +677,6 @@ convolutional_layer make_convolutional_layer(int batch, int steps, int h, int w,
 
 #ifdef GPU
 
-
     l.forward_gpu = forward_convolutional_layer_gpu;
     l.backward_gpu = backward_convolutional_layer_gpu;
     l.update_gpu = update_convolutional_layer_gpu;
@@ -690,7 +689,7 @@ convolutional_layer make_convolutional_layer(int batch, int steps, int h, int w,
 
         if (l.deform) l.weight_deform_gpu = cuda_make_array(NULL, l.nweights);
 
-        if (adam) {
+        if (adam) {		// unused
             l.m_gpu = cuda_make_array(l.m, l.nweights);
             l.v_gpu = cuda_make_array(l.v, l.nweights);
             l.bias_m_gpu = cuda_make_array(l.bias_m, n);
